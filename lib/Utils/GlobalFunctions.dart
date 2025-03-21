@@ -1,4 +1,4 @@
-import 'package:buslink_flutter/Utils/theme.dart';
+import 'package:buslink_flutter/Utils/Theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -20,7 +20,7 @@ mixin GlobalFunctions {
             children: [
               CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  AppTheme.primaryColor,
+                  AppTheme.lightTheme.primaryColor,
                 ),
               ),
               SizedBox(height: 16),

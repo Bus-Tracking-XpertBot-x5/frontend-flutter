@@ -1,8 +1,12 @@
-import 'package:buslink_flutter/Widgets/BusLinkLogo.dart';
+import 'package:buslink_flutter/Utils/Theme.dart';
+import 'package:flutter/services.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:buslink_flutter/Controllers/SignUpController.dart';
+import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:buslink_flutter/Controllers/AuthController.dart';
 import 'package:buslink_flutter/Utils/GlobalFunctions.dart';
+import 'package:buslink_flutter/Widgets/MyTitle.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -12,38 +16,16 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> with GlobalFunctions {
-  var isLoading = false.obs;
-  final authController = Get.put(AuthController());
+  final SignUpController signUpController = Get.find<SignUpController>();
   final formKey = GlobalKey<FormState>();
 
-  late final TextEditingController fullNameController = TextEditingController();
+  late final TextEditingController nameController = TextEditingController();
   late final TextEditingController phoneNumberController =
       TextEditingController();
   late final TextEditingController emailController = TextEditingController();
   late final TextEditingController passwordController = TextEditingController();
   late final TextEditingController passwordConfirmationController =
       TextEditingController();
-
-  Future<void> _submitForm() async {
-    if (isLoading.value) return;
-
-    final isValid = formKey.currentState!.validate();
-    if (!isValid) {
-      return;
-    }
-    isLoading = true.obs;
-    final isSuccess = await authController.signUp(
-      fullNameController.text.trim(),
-      phoneNumberController.text.trim(),
-      emailController.text.trim(),
-      passwordController.text.trim(),
-      passwordConfirmationController.text.trim(),
-    );
-    isLoading = false.obs;
-    if (isSuccess) {
-      Get.toNamed('home');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,29 +35,7 @@ class _SignUpPageState extends State<SignUpPage> with GlobalFunctions {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor, // Primary color background
-              borderRadius: BorderRadius.circular(8.0), // Rounded corners
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.white, // Icon color set to white
-              ),
-              onPressed: () => Get.back(),
-            ),
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        title: BusLinkLogo(),
-        centerTitle: true,
-      ),
+      appBar: MyAppBar(),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(
@@ -92,26 +52,17 @@ class _SignUpPageState extends State<SignUpPage> with GlobalFunctions {
                   children: [
                     // Title Text
                     const SizedBox(height: 12),
-                    Text(
-                      "Create an Account",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.06, // Responsive font size
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    MyTitle(title: "Create an Account"),
                     SizedBox(
                       height: screenHeight * 0.05, // Responsive spacing
                     ),
                     // Name TextFormField
                     TextFormField(
-                      controller: fullNameController,
+                      controller: nameController,
                       decoration: InputDecoration(
                         labelText: "Name",
                         prefixIcon: const Icon(Icons.person),
-                        border: const OutlineInputBorder(),
-                        errorText: authController.fieldErrors['full_name'],
-                        // Show full name error
+                        errorText: signUpController.fieldErrors['name'],
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -122,19 +73,19 @@ class _SignUpPageState extends State<SignUpPage> with GlobalFunctions {
                     ),
                     SizedBox(height: screenHeight * 0.03),
                     // Username TextFormField
-                    TextFormField(
-                      controller: phoneNumberController,
+                    IntlPhoneField(
                       decoration: InputDecoration(
                         labelText: "Phone Number",
                         prefixIcon: const Icon(Icons.phone),
-                        border: const OutlineInputBorder(),
-                        errorText: authController.fieldErrors['phone_number'],
+                        errorText: signUpController.fieldErrors['phone_number'],
+                        counterText: '',
                       ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Field is required";
-                        }
-                        return null;
+                      autovalidateMode: AutovalidateMode.onUnfocus,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      initialCountryCode: 'LB',
+                      onChanged: (phone) {
+                        phoneNumberController.text = phone.completeNumber;
                       },
                     ),
                     SizedBox(height: screenHeight * 0.03),
@@ -144,10 +95,7 @@ class _SignUpPageState extends State<SignUpPage> with GlobalFunctions {
                       decoration: InputDecoration(
                         labelText: "Email",
                         prefixIcon: const Icon(Icons.email),
-                        border: const OutlineInputBorder(),
-                        errorText:
-                            authController
-                                .fieldErrors['email'], // Show email error
+                        errorText: signUpController.fieldErrors['email'],
                       ),
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
@@ -167,23 +115,16 @@ class _SignUpPageState extends State<SignUpPage> with GlobalFunctions {
                       decoration: InputDecoration(
                         labelText: "Password",
                         prefixIcon: const Icon(Icons.lock),
-                        border: const OutlineInputBorder(),
-                        errorText: authController.fieldErrors['password'],
+                        errorText: signUpController.fieldErrors['password'],
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
                           return "Field is required";
                         }
-                        if (value.length < 8) {
-                          return "Password must be at least 8 characters";
+                        if (value.length < 6) {
+                          return "Password must be at least 6 characters";
                         }
-                        if (passwordConfirmationController.text
-                                .trim()
-                                .isNotEmpty &&
-                            value !=
-                                passwordConfirmationController.text.trim()) {
-                          return "Passwords do not match";
-                        }
+
                         return null;
                       },
                       obscureText: true,
@@ -195,57 +136,36 @@ class _SignUpPageState extends State<SignUpPage> with GlobalFunctions {
                       decoration: InputDecoration(
                         labelText: "Confirm Password",
                         prefixIcon: const Icon(Icons.lock),
-                        border: const OutlineInputBorder(),
-                        errorText:
-                            authController.fieldErrors['password_confirmation'],
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
                           return "Field is required";
                         }
+                        if (passwordController.text.trim().isNotEmpty &&
+                            value != passwordController.text.trim()) {
+                          return "Passwords do not match";
+                        }
                         return null;
                       },
                       obscureText: true,
                     ),
-                    SizedBox(height: screenHeight * 0.01),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        TextButton(
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.zero,
-                            minimumSize: Size(0, 0),
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          onPressed: () {
-                            Get.toNamed('user-selection');
-                          },
-                          child: Text(
-                            "Forget Password?",
-                            style: TextStyle(
-                              color: Theme.of(context).secondaryHeaderColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize:
-                                  screenWidth * 0.04, // Responsive font size
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: screenHeight * 0.04),
-                    // Signup Button
+                    SizedBox(height: screenHeight * 0.03),
+
                     ElevatedButton(
                       onPressed: () {
-                        Get.toNamed('verify-sms');
+                        if (!signUpController.isLoading.value &&
+                            formKey.currentState!.validate()) {
+                          signUpController.registerUser(
+                            nameController.text.trim(),
+                            emailController.text.trim(),
+                            phoneNumberController.text.trim(),
+                            passwordController.text.trim(),
+                            passwordConfirmationController.text.trim(),
+                          );
+                        }
                       },
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          vertical: screenHeight * 0.02,
-                        ),
-                        textStyle: TextStyle(fontSize: screenWidth * 0.045),
-                      ),
                       child:
-                          isLoading.value
+                          signUpController.isLoading.value
                               ? const SizedBox(
                                 width: 20,
                                 height: 20,
@@ -263,8 +183,7 @@ class _SignUpPageState extends State<SignUpPage> with GlobalFunctions {
                         Text(
                           "Already have an account? ",
                           style: TextStyle(
-                            fontSize:
-                                screenWidth * 0.04, // Responsive font size
+                            fontSize: 16, // Responsive font size
                           ),
                         ),
                         TextButton(
@@ -274,15 +193,14 @@ class _SignUpPageState extends State<SignUpPage> with GlobalFunctions {
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           onPressed: () {
-                            Get.toNamed('/sign-in');
+                            Get.offAndToNamed('/signIn');
                           },
                           child: Text(
                             "Login",
                             style: TextStyle(
-                              color: Theme.of(context).secondaryHeaderColor,
+                              color: AppTheme.lightTheme.colorScheme.secondary,
                               fontWeight: FontWeight.bold,
-                              fontSize:
-                                  screenWidth * 0.045, // Responsive font size
+                              fontSize: 16, // Responsive font size
                             ),
                           ),
                         ),

@@ -1,7 +1,8 @@
+import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:page_view_dot_indicator/page_view_dot_indicator.dart';
-import 'package:buslink_flutter/Utils/theme.dart';
+import 'package:buslink_flutter/Utils/Theme.dart';
 
 class LandingPage extends StatefulWidget {
   @override
@@ -13,14 +14,8 @@ class _LandingPageState extends State<LandingPage> {
   final PageController _pageController = PageController();
 
   final List<Map<String, String>> pages = [
-    {
-      "image": "images/landing-1.png",
-      "text": "Welcome to BusLink",
-    },
-    {
-      "image": "images/landing-2.png",
-      "text": "Connect with Real-Time Updates",
-    },
+    {"image": "images/landing-1.png", "text": "Welcome to buslink_flutter"},
+    {"image": "images/landing-2.png", "text": "Connect with Real-Time Updates"},
     {
       "image": "images/landing-3.png",
       "text": "Share your moments with the world",
@@ -30,6 +25,7 @@ class _LandingPageState extends State<LandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: MyAppBar(),
       body: Column(
         children: [
           Expanded(
@@ -83,9 +79,7 @@ class _LandingPageState extends State<LandingPage> {
                       ),
                     ),
 
-                    const SizedBox(
-                      height: 12,
-                    )
+                    const SizedBox(height: 12),
                   ],
                 );
               },
@@ -96,7 +90,7 @@ class _LandingPageState extends State<LandingPage> {
             currentItem: selectedPage,
             count: pages.length,
             unselectedColor: Colors.black26,
-            selectedColor: AppTheme.secondaryColor,
+            selectedColor: AppTheme.lightTheme.primaryColor,
             duration: const Duration(milliseconds: 200),
             size: Size(30, 8),
             unselectedSize: Size(8, 8),
@@ -118,7 +112,7 @@ class _LandingPageState extends State<LandingPage> {
               child: ElevatedButton(
                 onPressed: () {
                   if (selectedPage == pages.length - 1) {
-                    Get.toNamed('/sign-up');
+                    Get.offAndToNamed('/signUp');
                   } else {
                     _pageController.nextPage(
                       duration: const Duration(milliseconds: 300),
@@ -133,7 +127,7 @@ class _LandingPageState extends State<LandingPage> {
               ),
             ),
           ),
-          const SizedBox(height: 60,)
+          const SizedBox(height: 60),
         ],
       ),
     );

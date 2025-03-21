@@ -37,10 +37,22 @@ dependencies:
   geolocator: ^12.0.0
   geocoding: ^2.2.2
   permission_handler: any
+  flutter_launcher_icons: any
+  url_launcher: any
+  intl_phone_field: any
+  google_fonts: any
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "images/logo.png"
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   url_launcher: any
+  google_fonts: ^6.2.1
+  intl_phone_field: ^3.2.0
 
 dev_dependencies:
   flutter_test:

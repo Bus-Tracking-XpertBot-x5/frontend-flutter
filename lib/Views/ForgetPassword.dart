@@ -1,8 +1,8 @@
-import 'package:buslink_flutter/Widgets/BusLinkLogo.dart';
+import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:buslink_flutter/Controllers/AuthController.dart';
+import 'package:buslink_flutter/Controllers/ForgetPasswordController.dart';
 import 'package:buslink_flutter/Utils/GlobalFunctions.dart';
 
 class ForgetPasswordPage extends StatefulWidget {
@@ -15,7 +15,9 @@ class ForgetPasswordPage extends StatefulWidget {
 class _ForgetPasswordPageState extends State<ForgetPasswordPage>
     with GlobalFunctions {
   var isLoading = false.obs;
-  final authController = Get.put(AuthController());
+  final ForgetPasswordController forgetPasswordController =
+      Get.find<ForgetPasswordController>();
+
   final formKey = GlobalKey<FormState>();
 
   late final TextEditingController emailController = TextEditingController();
@@ -30,29 +32,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage>
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor, // Primary color background
-              borderRadius: BorderRadius.circular(8.0), // Rounded corners
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.white, // Icon color set to white
-              ),
-              onPressed: () => Get.back(),
-            ),
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        title: BusLinkLogo(),
-        centerTitle: true,
-      ),
+      appBar: MyAppBar(),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(
@@ -93,7 +73,8 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage>
                         labelText: "Enter Email",
                         prefixIcon: const Icon(Icons.email),
                         border: const OutlineInputBorder(),
-                        errorText: authController.fieldErrors['full_name'],
+                        errorText:
+                            forgetPasswordController.fieldErrors['full_name'],
                         // Show full name error
                       ),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -109,7 +90,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage>
                     // ForgetPasswordPage Button
                     ElevatedButton(
                       onPressed: () {
-                        Get.offAllNamed('enable-gps');
+                        Get.offAllNamed('enableGpsLocation');
                       },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(

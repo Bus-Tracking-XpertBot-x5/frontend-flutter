@@ -1,4 +1,5 @@
-import 'package:buslink_flutter/Widgets/BusLinkLogo.dart';
+import 'package:buslink_flutter/Widgets/MyAppBar.dart';
+import 'package:buslink_flutter/Widgets/MyLogo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,8 +11,6 @@ class UserSelectionPage extends StatelessWidget {
   void _contactAdmin() async {
     const String adminWhatsApp =
         "https://wa.me/96171595345"; // Replace with actual number
-    const String adminEmail =
-        "mailto:admin@buslink.com?subject=Organization%20Registration"; // Replace with actual email
 
     await launchUrl(
       Uri.parse(adminWhatsApp),
@@ -26,13 +25,7 @@ class UserSelectionPage extends StatelessWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        title: BusLinkLogo(),
-        centerTitle: true,
-      ),
+      appBar: MyAppBar(),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(
@@ -54,7 +47,7 @@ class UserSelectionPage extends StatelessWidget {
                 ),
               ),
               Text(
-                "Welcome to BusLink",
+                "Welcome to buslink_flutter",
                 style: TextStyle(
                   fontSize: screenWidth * 0.07,
                   fontWeight: FontWeight.bold,
@@ -67,7 +60,7 @@ class UserSelectionPage extends StatelessWidget {
               ElevatedButton(
                 onPressed:
                     () => Get.toNamed(
-                      '/passenger-dashboard',
+                      '/enableGpsLocation',
                     ), // Replace with actual route
                 style: ElevatedButton.styleFrom(
                   minimumSize: Size(double.infinity, screenHeight * 0.07),
@@ -88,7 +81,10 @@ class UserSelectionPage extends StatelessWidget {
                     width: 2,
                   ),
                 ),
-                child: const Text("Register as Organization"),
+                child: Text(
+                  "Register as Organization",
+                  style: TextStyle(color: Theme.of(context).primaryColor),
+                ),
               ),
 
               SizedBox(height: screenHeight * 0.05),

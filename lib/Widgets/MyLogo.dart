@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-class BusLinkLogo extends StatelessWidget {
-  const BusLinkLogo({super.key});
+class MyLogo extends StatelessWidget {
+  const MyLogo({super.key});
 
   @override
   Widget build(BuildContext context) {

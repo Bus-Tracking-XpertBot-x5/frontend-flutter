@@ -1,8 +1,8 @@
-import 'package:buslink_flutter/Widgets/BusLinkLogo.dart';
+import 'package:buslink_flutter/Controllers/VerifySMSController.dart';
+import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:buslink_flutter/Controllers/AuthController.dart';
 import 'package:buslink_flutter/Utils/GlobalFunctions.dart';
 
 class VerifySMSPage extends StatefulWidget {
@@ -14,7 +14,8 @@ class VerifySMSPage extends StatefulWidget {
 
 class _VerifySMSPageState extends State<VerifySMSPage> with GlobalFunctions {
   var isLoading = false.obs;
-  final authController = Get.put(AuthController());
+  final VerifySMSController _verifySMSController =
+      Get.find<VerifySMSController>();
   final formKey = GlobalKey<FormState>();
 
   late final TextEditingController verificationCodeController =
@@ -30,29 +31,7 @@ class _VerifySMSPageState extends State<VerifySMSPage> with GlobalFunctions {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor, // Primary color background
-              borderRadius: BorderRadius.circular(8.0), // Rounded corners
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.white, // Icon color set to white
-              ),
-              onPressed: () => Get.back(),
-            ),
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        title: BusLinkLogo(),
-        centerTitle: true,
-      ),
+      appBar: MyAppBar(),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(
@@ -105,7 +84,8 @@ class _VerifySMSPageState extends State<VerifySMSPage> with GlobalFunctions {
                         labelText: "Enter Verification Code",
                         prefixIcon: const Icon(Icons.lock),
                         border: const OutlineInputBorder(),
-                        errorText: authController.fieldErrors['full_name'],
+                        errorText:
+                            _verifySMSController.fieldErrors['full_name'],
                         // Show full name error
                       ),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -121,7 +101,7 @@ class _VerifySMSPageState extends State<VerifySMSPage> with GlobalFunctions {
                     // VerifySMS Button
                     ElevatedButton(
                       onPressed: () {
-                        Get.toNamed('enable-gps');
+                        Get.offAllNamed('userSelection');
                       },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(

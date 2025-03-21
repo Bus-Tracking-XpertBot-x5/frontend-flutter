@@ -1,3 +1,4 @@
+import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -31,24 +32,29 @@ class _EnableGPSPageState extends State<EnableGPSPage> with GeoLocator {
           contentPadding: EdgeInsets.only(bottom: 26),
           title: 'Location Access Required',
           middleText:
-          'This app needs access to your location. Please enable location permissions from your app settings.',
+              'This app needs access to your location. Please enable location permissions from your app settings.',
           textConfirm: 'Open Settings',
           onConfirm: () async {
             await Geolocator.openAppSettings();
             Get.back();
           },
           textCancel: 'Cancel',
-
         );
+        return;
       }
     } finally {
-      print(locationMessage);
+      if (locationMessage.contains('Lat')) {
+        Get.offAllNamed('passengerDashboard');
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
+      appBar: MyAppBar(),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
@@ -70,16 +76,18 @@ class _EnableGPSPageState extends State<EnableGPSPage> with GeoLocator {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                'Enable GPS Location',
-                style: Theme.of(context).textTheme.headlineSmall,
+                "Enable GPS Location",
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: screenWidth * 0.06, // Responsive font size
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              const SizedBox(height: 10),
-              Text(
-                locationMessage,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: Colors.red),
-              ),
+              // Text(
+              //   locationMessage,
+              //   textAlign: TextAlign.center,
+              //   style: const TextStyle(fontSize: 14, color: Colors.red),
+              // ),
             ],
           ),
           const SizedBox(height: 20),
@@ -89,7 +97,10 @@ class _EnableGPSPageState extends State<EnableGPSPage> with GeoLocator {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: _getLocation,
-                child: const Text('Enable to Continue', style: TextStyle(fontSize: 16)),
+                child: const Text(
+                  'Enable to Continue',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ),
           ),

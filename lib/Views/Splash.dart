@@ -1,11 +1,11 @@
+import 'package:buslink_flutter/Services/AuthService.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:buslink_flutter/Controllers/AuthController.dart';
 
 class SplashPage extends StatelessWidget {
   SplashPage({super.key});
 
-  final AuthController controller = Get.find<AuthController>();
+  final AuthService authService = Get.find<AuthService>();
 
   @override
   Widget build(BuildContext context) {

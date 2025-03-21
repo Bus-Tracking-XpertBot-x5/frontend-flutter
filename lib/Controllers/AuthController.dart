@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:buslink_flutter/Models/UserModel.dart';
-import 'package:buslink_flutter/Utils/Api.dart';
+import 'package:buslink_flutter/Services/Api.dart';
 import 'package:buslink_flutter/Utils/GlobalFunctions.dart';
 
 class AuthController extends GetxController with GlobalFunctions {
@@ -35,7 +35,7 @@ class AuthController extends GetxController with GlobalFunctions {
         print(user);
         Get.toNamed('home', preventDuplicates: false);
       } else {
-        Get.toNamed('landing', preventDuplicates: false);
+        Get.offAndToNamed('landing');
       }
     });
   }
@@ -44,16 +44,13 @@ class AuthController extends GetxController with GlobalFunctions {
     fieldErrors.clear(); // Clear errors before each request
     try {
       final response = await Api.dio.post(
-        '/sign-in',
+        '/signIn',
         queryParameters: {'email': email, 'password': password},
       );
 
       if (response.statusCode == 200) {
         final data = (response.data['data']);
-        user = UserModel.fromJson({
-          ...data['user'],
-          'token': data['token'],
-        });
+        user = UserModel.fromJson({...data['user'], 'token': data['token']});
 
         GetStorage().write('login_token', user?.token);
         return true; // Success
@@ -74,8 +71,13 @@ class AuthController extends GetxController with GlobalFunctions {
     }
   }
 
-  Future<bool> signUp(String fullName, String username, String email,
-      String password, String passwordConfirmation) async {
+  Future<bool> signUp(
+    String fullName,
+    String username,
+    String email,
+    String password,
+    String passwordConfirmation,
+  ) async {
     fieldErrors.clear();
     try {
       final response = await Api.dio.post(
@@ -85,16 +87,13 @@ class AuthController extends GetxController with GlobalFunctions {
           'username': username,
           'email': email,
           'password': password,
-          'password_confirmation': passwordConfirmation
+          'password_confirmation': passwordConfirmation,
         },
       );
 
       if (response.statusCode == 200) {
         final data = (response.data['data']);
-        user = UserModel.fromJson({
-          ...data['user'],
-          'token': data['token'],
-        });
+        user = UserModel.fromJson({...data['user'], 'token': data['token']});
 
         GetStorage().write('login_token', user?.token);
         return true;
@@ -131,9 +130,7 @@ class AuthController extends GetxController with GlobalFunctions {
 
   Future<bool> getUser() async {
     try {
-      final response = await Api.dio.get(
-        '/me',
-      );
+      final response = await Api.dio.get('/me');
 
       if (response.statusCode == 200) {
         final data = (response.data['data']);

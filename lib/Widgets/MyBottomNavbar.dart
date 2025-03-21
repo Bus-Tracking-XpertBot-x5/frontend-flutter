@@ -5,26 +5,24 @@ class BottomNavController extends GetxController {
   var currentIndex = 0.obs;
 
   final List<String> pages = [
-    '/home',
-    '/bus-stops',
+    '/passengerDashboard',
+    '/busRoutes',
     '/notifications',
-    '/profile',
+    '/settings',
   ];
 
   void updateIndex(int index) {
     currentIndex.value = index;
-    Get.offNamed(
-      pages[index],
-    ); // Replaces the previous route instead of stacking
+    Get.offAndToNamed(pages[index]);
   }
 }
 
-class BusLinkBottomNavbar extends StatelessWidget {
-  const BusLinkBottomNavbar({super.key});
+class MyBottomNavbar extends StatelessWidget {
+  const MyBottomNavbar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final BottomNavController navController = Get.put(BottomNavController());
+    final BottomNavController navController = Get.find<BottomNavController>();
 
     return Obx(
       () => Container(

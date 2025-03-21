@@ -1,8 +1,10 @@
-import 'package:buslink_flutter/Widgets/BusLinkLogo.dart';
+import 'package:buslink_flutter/Controllers/SignInController.dart';
+import 'package:buslink_flutter/Utils/theme.dart';
+import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:buslink_flutter/Controllers/AuthController.dart';
 import 'package:buslink_flutter/Utils/GlobalFunctions.dart';
+import 'package:buslink_flutter/Widgets/MyTitle.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -12,30 +14,11 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> with GlobalFunctions {
-  var isLoading = false.obs;
-  final authController = Get.put(AuthController());
+  final SignInController signInController = Get.find<SignInController>();
   final formKey = GlobalKey<FormState>();
 
-  late final TextEditingController phoneNumberController =
-      TextEditingController();
+  late final TextEditingController emailController = TextEditingController();
   late final TextEditingController passwordController = TextEditingController();
-
-  // Future<void> _submitForm() async {
-  //   if (isLoading.value) return;
-  //   final isValid = formKey.currentState!.validate();
-  //   if (!isValid) {
-  //     return;
-  //   }
-  //   isLoading = true.obs;
-  //   final isSuccess = await authController.signUp(
-  //     phoneNumberController.text.trim(),
-  //     passwordController.text.trim()
-  //   );
-  //   isLoading = false.obs;
-  //   if (isSuccess) {
-  //     Get.toNamed('home');
-  //   }
-  // }
 
   @override
   Widget build(BuildContext context) {
@@ -45,29 +28,7 @@ class _SignInPageState extends State<SignInPage> with GlobalFunctions {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor, // Primary color background
-              borderRadius: BorderRadius.circular(8.0), // Rounded corners
-            ),
-            child: IconButton(
-              icon: Icon(
-                Icons.arrow_back,
-                color: Colors.white, // Icon color set to white
-              ),
-              onPressed: () => Get.back(),
-            ),
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.white,
-        title: BusLinkLogo(),
-        centerTitle: true,
-      ),
+      appBar: MyAppBar(),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(
@@ -84,25 +45,17 @@ class _SignInPageState extends State<SignInPage> with GlobalFunctions {
                   children: [
                     // Title Text
                     const SizedBox(height: 12),
-                    Text(
-                      "Sign In",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: screenWidth * 0.06, // Responsive font size
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    MyTitle(title: "Login"),
                     SizedBox(
                       height: screenHeight * 0.05, // Responsive spacing
                     ),
                     // Phone Number
                     TextFormField(
-                      controller: phoneNumberController,
+                      controller: emailController,
                       decoration: InputDecoration(
-                        labelText: "Phone Number",
-                        prefixIcon: Icon(Icons.phone),
-                        border: OutlineInputBorder(),
-                        errorText: authController.fieldErrors['phone_number'],
+                        labelText: "Email",
+                        prefixIcon: Icon(Icons.email),
+                        errorText: signInController.fieldErrors['phone_number'],
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
@@ -118,15 +71,14 @@ class _SignInPageState extends State<SignInPage> with GlobalFunctions {
                       decoration: InputDecoration(
                         labelText: "Password",
                         prefixIcon: Icon(Icons.lock),
-                        border: OutlineInputBorder(),
-                        errorText: authController.fieldErrors['password'],
+                        errorText: signInController.fieldErrors['password'],
                       ),
                       validator: (value) {
                         if (value!.isEmpty) {
                           return "Field is required";
                         }
-                        if (value.length < 8) {
-                          return "Password must be at least 8 characters";
+                        if (value.length < 6) {
+                          return "Password must be at least 6 characters";
                         }
                         return null;
                       },
@@ -136,41 +88,40 @@ class _SignInPageState extends State<SignInPage> with GlobalFunctions {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        // TextButton(
-                        //   style: TextButton.styleFrom(
-                        //     padding: EdgeInsets.zero,
-                        //     minimumSize: Size(0, 0),
-                        //     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        //   ),
-                        //   onPressed: () {
-                        //     print("Forget Password?");
-                        //   },
-                        //   child: Text(
-                        //     "Forget Password?",
-                        //     style: TextStyle(
-                        //       color: Colors.black,
-                        //       fontWeight: FontWeight.bold,
-                        //       fontSize:
-                        //           screenWidth * 0.04, // Responsive font size
-                        //     ),
-                        //   ),
-                        // ),
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size(0, 0),
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: () {
+                            Get.toNamed('forgetPassword');
+                          },
+                          child: Text(
+                            "Forget Password?",
+                            style: TextStyle(
+                              color: AppTheme.lightTheme.colorScheme.secondary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12, // Responsive font size
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                    SizedBox(height: screenHeight * 0.04),
+                    SizedBox(height: screenHeight * 0.03),
                     // Signup Button
                     ElevatedButton(
                       onPressed: () {
-                        // _submitForm();
+                        if (!signInController.isLoading.value &&
+                            formKey.currentState!.validate()) {
+                          signInController.loginUser(
+                            emailController.text.trim(),
+                            passwordController.text.trim(),
+                          );
+                        }
                       },
-                      style: ElevatedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(
-                          vertical: screenHeight * 0.02,
-                        ),
-                        textStyle: TextStyle(fontSize: screenWidth * 0.045),
-                      ),
                       child:
-                          isLoading.value
+                          signInController.isLoading.value
                               ? SizedBox(
                                 width: 20,
                                 height: 20,
@@ -178,7 +129,7 @@ class _SignInPageState extends State<SignInPage> with GlobalFunctions {
                                   color: Colors.white,
                                 ),
                               )
-                              : Text("Sign Up"),
+                              : Text("Sign In"),
                     ),
                     SizedBox(height: screenHeight * 0.03),
                     // Already have an account? Text Button
@@ -188,8 +139,7 @@ class _SignInPageState extends State<SignInPage> with GlobalFunctions {
                         Text(
                           "Don't have an account? ",
                           style: TextStyle(
-                            fontSize:
-                                screenWidth * 0.04, // Responsive font size
+                            fontSize: 16, // Responsive font size
                           ),
                         ),
                         TextButton(
@@ -199,15 +149,14 @@ class _SignInPageState extends State<SignInPage> with GlobalFunctions {
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           onPressed: () {
-                            Get.toNamed('/sign-up');
+                            Get.offAndToNamed('/signUp');
                           },
                           child: Text(
                             "Sign Up",
                             style: TextStyle(
-                              color: Theme.of(context).secondaryHeaderColor,
+                              color: AppTheme.lightTheme.colorScheme.secondary,
                               fontWeight: FontWeight.bold,
-                              fontSize:
-                                  screenWidth * 0.045, // Responsive font size
+                              fontSize: 16, // Responsive font size
                             ),
                           ),
                         ),

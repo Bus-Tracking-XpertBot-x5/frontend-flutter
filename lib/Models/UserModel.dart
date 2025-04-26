@@ -1,39 +1,66 @@
+import 'package:buslink_flutter/Models/OrganizationModel.dart';
+
 class UserModel {
   final int id;
-  final String fullName;
-  final String username;
-  final String email;
+  String name;
+  String phoneNumber;
+  String email;
+  String role;
   final String? token;
+  double? latitude;
+  double? longitude;
+  OrganizationModel? organization;
 
   UserModel({
     required this.id,
-    required this.fullName,
-    required this.username,
+    required this.name,
+    required this.phoneNumber,
     required this.email,
+    required this.role,
     this.token,
+    required this.latitude,
+    required this.longitude,
+    this.organization,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       id: json['id'],
-      fullName: json['fullName'],
+      name: json['name'],
       email: json['email'],
-      username: json['username'],
+      phoneNumber: json['phone_number'],
+      role: json['role'],
       token: json['token'],
+      latitude:
+          json['latitude'] != null
+              ? double.tryParse(json['latitude'].toString())
+              : null,
+      longitude:
+          json['longitude'] != null
+              ? double.tryParse(json['longitude'].toString())
+              : null,
+      organization:
+          json['organization'] != null
+              ? OrganizationModel.fromJson(json['organization'])
+              : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'fullName': fullName,
+      'name': name,
       'email': email,
-      'username': username,
+      'phoneNumber': phoneNumber,
+      'role': role,
+      'latitude': latitude,
+      'longitude': longitude,
+      'organization': organization?.toJson(),
     };
   }
 
   @override
   String toString() {
-    return 'UserModel{fullName: $fullName,usernameL $username , email: $email}';
+    return 'UserModel{name: $name, phoneNumber: $phoneNumber, email: $email, role: $role, organization: ${organization?.name}}';
   }
 }

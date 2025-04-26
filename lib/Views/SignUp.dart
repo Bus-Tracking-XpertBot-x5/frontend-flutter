@@ -80,7 +80,6 @@ class _SignUpPageState extends State<SignUpPage> with GlobalFunctions {
                         errorText: signUpController.fieldErrors['phone_number'],
                         counterText: '',
                       ),
-                      autovalidateMode: AutovalidateMode.onUnfocus,
                       keyboardType: TextInputType.number,
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       initialCountryCode: 'LB',

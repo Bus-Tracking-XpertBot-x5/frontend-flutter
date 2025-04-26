@@ -2,9 +2,11 @@ import 'package:buslink_flutter/Controllers/SignInController.dart';
 import 'package:buslink_flutter/Utils/theme.dart';
 import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:buslink_flutter/Utils/GlobalFunctions.dart';
 import 'package:buslink_flutter/Widgets/MyTitle.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -14,10 +16,11 @@ class SignInPage extends StatefulWidget {
 }
 
 class _SignInPageState extends State<SignInPage> with GlobalFunctions {
-  final SignInController signInController = Get.find<SignInController>();
-  final formKey = GlobalKey<FormState>();
+  late final SignInController signInController = Get.find<SignInController>();
+  late final formKey = GlobalKey<FormState>();
 
-  late final TextEditingController emailController = TextEditingController();
+  late final TextEditingController phoneNumberController =
+      TextEditingController();
   late final TextEditingController passwordController = TextEditingController();
 
   @override
@@ -50,18 +53,18 @@ class _SignInPageState extends State<SignInPage> with GlobalFunctions {
                       height: screenHeight * 0.05, // Responsive spacing
                     ),
                     // Phone Number
-                    TextFormField(
-                      controller: emailController,
+                    IntlPhoneField(
                       decoration: InputDecoration(
-                        labelText: "Email",
-                        prefixIcon: Icon(Icons.email),
+                        labelText: "Phone Number",
+                        prefixIcon: const Icon(Icons.phone),
                         errorText: signInController.fieldErrors['phone_number'],
+                        counterText: '',
                       ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "Field is required";
-                        }
-                        return null;
+                      keyboardType: TextInputType.number,
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      initialCountryCode: 'LB',
+                      onChanged: (phone) {
+                        phoneNumberController.text = phone.completeNumber;
                       },
                     ),
                     SizedBox(height: screenHeight * 0.03),
@@ -115,7 +118,7 @@ class _SignInPageState extends State<SignInPage> with GlobalFunctions {
                         if (!signInController.isLoading.value &&
                             formKey.currentState!.validate()) {
                           signInController.loginUser(
-                            emailController.text.trim(),
+                            phoneNumberController.text.trim(),
                             passwordController.text.trim(),
                           );
                         }

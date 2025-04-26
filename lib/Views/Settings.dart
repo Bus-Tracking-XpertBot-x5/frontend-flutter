@@ -1,11 +1,23 @@
+import 'package:buslink_flutter/Controllers/LogoutController.dart';
+import 'package:buslink_flutter/Services/AuthService.dart';
+import 'package:buslink_flutter/Utils/Dialog.dart';
 import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:buslink_flutter/Widgets/MyBottomNavbar.dart';
-import 'package:buslink_flutter/Widgets/MyFloatingActionButton.dart';
 import 'package:buslink_flutter/Widgets/MyHeader.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:get/get.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  final AuthService _authService = Get.find<AuthService>();
+  final LogoutController _logoutController = Get.find<LogoutController>();
 
   @override
   Widget build(BuildContext context) {
@@ -13,9 +25,6 @@ class SettingsPage extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      floatingActionButton: const MyFloatingActionButton(),
-      floatingActionButtonLocation:
-          FloatingActionButtonLocation.miniCenterFloat,
       bottomNavigationBar: const MyBottomNavbar(),
       appBar: MyAppBar(),
       body: Padding(
@@ -34,36 +43,88 @@ class SettingsPage extends StatelessWidget {
                   title: 'Profile',
                   subtitle: 'Update personal information',
                   color: Colors.blue[800]!,
+                  onTap: () {
+                    Get.toNamed('/updateProfile');
+                  },
                 ),
                 _buildSettingsItem(
                   context,
-                  icon: Icons.history,
-                  title: 'Trip History',
-                  subtitle: 'View past journeys',
-                  color: Colors.purple[600]!,
+                  icon: Icons.lock,
+                  title: 'Change Password',
+                  subtitle: 'Modify for more security',
+                  color: Colors.deepOrange[600]!,
+                  onTap: () {
+                    Get.toNamed('/changePassword');
+                  },
+                ),
+                if (_authService.globalUser!.role != "driver")
+                  _buildSettingsItem(
+                    context,
+                    icon: Icons.history,
+                    title: 'Trip History',
+                    subtitle: 'View past journeys',
+                    color: Colors.purple[600]!,
+                    onTap: () {
+                      Get.toNamed('/tripHistory');
+                    },
+                  ),
+                _buildSettingsItem(
+                  context,
+                  icon: Icons.place,
+                  title: 'Location',
+                  subtitle: 'Enable GPS Location',
+                  color: Colors.lightGreen[600]!,
+                  onTap: () {
+                    Get.toNamed('/enableGpsLocation');
+                  },
                 ),
               ]),
               SizedBox(height: screenHeight * 0.02),
               _buildSettingsSection(context, 'Preferences', [
-                _buildSettingsItem(
-                  context,
-                  icon: Icons.notifications_outlined,
-                  title: 'Notifications',
-                  subtitle: 'Manage alert preferences',
-                  color: Colors.orange[800]!,
-                  trailing: Switch(
-                    value: true,
-                    onChanged: (bool value) {},
-                    activeColor: Theme.of(context).primaryColor,
+                if (_authService.globalUser!.role != "driver")
+                  _buildSettingsItem(
+                    context,
+                    icon: Icons.wysiwyg_outlined,
+                    title: 'Organization',
+                    subtitle: 'Pick your organization',
+                    color: Colors.teal[600]!,
+                    onTap: () {
+                      Get.toNamed('/pickOrganization');
+                    },
                   ),
-                ),
-                _buildSettingsItem(
-                  context,
-                  icon: Icons.credit_card,
-                  title: 'Subscriptions',
-                  subtitle: 'Manage payment plans',
-                  color: Colors.teal[600]!,
-                ),
+                if (_authService.globalUser!.role == "driver")
+                  _buildSettingsItem(
+                    context,
+                    icon: Icons.directions_bus_filled_rounded,
+                    title: 'Bus',
+                    subtitle: 'View your bus info.',
+                    color: Colors.amber[600]!,
+                    onTap: () {
+                      Get.toNamed('/driverBusInfo');
+                    },
+                  ),
+                if (_authService.globalUser!.role == "driver")
+                  _buildSettingsItem(
+                    context,
+                    icon: FontAwesome.drivers_license,
+                    title: 'Driver',
+                    subtitle: 'View your driver info.',
+                    color: Colors.blue[600]!,
+                    onTap: () {
+                      Get.toNamed('/driverInfo');
+                    },
+                  ),
+                if (_authService.globalUser!.role == "driver")
+                  _buildSettingsItem(
+                    context,
+                    icon: Icons.wysiwyg_outlined,
+                    title: 'Organization',
+                    subtitle: 'Pick your organization',
+                    color: Colors.teal[600]!,
+                    onTap: () {
+                      Get.toNamed('/driverOrganizationsInfo');
+                    },
+                  ),
               ]),
               SizedBox(height: screenHeight * 0.03),
               _buildLogoutButton(context),
@@ -114,12 +175,13 @@ class SettingsPage extends StatelessWidget {
     required String subtitle,
     required Color color,
     Widget? trailing,
+    VoidCallback? onTap,
   }) {
     return Material(
       color: Colors.white,
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {},
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
@@ -127,7 +189,7 @@ class SettingsPage extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
+                  color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 24),
@@ -163,12 +225,35 @@ class SettingsPage extends StatelessWidget {
 
   Widget _buildLogoutButton(BuildContext context) {
     return Center(
-      child: MaterialButton(
-        onPressed: () {},
-        child: Text('Log Out'),
-        color: Colors.red[600],
-        textColor: Colors.white,
-      ),
+      child: Obx(() {
+        _logoutController.isLoading.value ? print('LOADING>>>>>>>') : "";
+        return MaterialButton(
+          onPressed: () {
+            if (!_logoutController.isLoading.value) {
+              AppDialog.showConfirm(
+                message: 'Are you sure you want to logout?',
+                title: 'Confirm Logout.',
+                onConfirm: () async {
+                  await _logoutController.logout();
+                },
+              );
+            }
+          },
+          color: Colors.red[600],
+          textColor: Colors.white,
+          child:
+              _logoutController.isLoading.value
+                  ? const SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
+                  )
+                  : const Text('Log Out'),
+        );
+      }),
     );
   }
 }

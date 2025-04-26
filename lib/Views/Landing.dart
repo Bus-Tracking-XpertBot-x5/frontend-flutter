@@ -14,7 +14,7 @@ class _LandingPageState extends State<LandingPage> {
   final PageController _pageController = PageController();
 
   final List<Map<String, String>> pages = [
-    {"image": "images/landing-1.png", "text": "Welcome to buslink_flutter"},
+    {"image": "images/landing-1.png", "text": "Welcome to BusLink"},
     {"image": "images/landing-2.png", "text": "Connect with Real-Time Updates"},
     {
       "image": "images/landing-3.png",
@@ -90,7 +90,7 @@ class _LandingPageState extends State<LandingPage> {
             currentItem: selectedPage,
             count: pages.length,
             unselectedColor: Colors.black26,
-            selectedColor: AppTheme.lightTheme.primaryColor,
+            selectedColor: AppTheme.lightTheme.colorScheme.secondary,
             duration: const Duration(milliseconds: 200),
             size: Size(30, 8),
             unselectedSize: Size(8, 8),

@@ -1,26 +1,31 @@
+import 'package:buslink_flutter/Utils/Dialog.dart';
 import 'package:get/get.dart';
 import 'package:buslink_flutter/Services/AuthService.dart';
-import 'package:buslink_flutter/Utils/Dialog.dart';
 
-class VerifySMSController extends GetxController {
+class ChangePasswordController extends GetxController {
   final AuthService _authService = Get.find<AuthService>();
 
   final RxBool isLoading = false.obs;
   var fieldErrors = <String, String>{}.obs;
 
-  Future<void> veriyfEmailUser(String otp) async {
+  Future<void> changePassword({
+    required String oldPassword,
+    required String newPassword,
+    required String confirmPassword,
+  }) async {
     try {
       isLoading.value = true;
       fieldErrors.value = {};
 
-      final bool emailVerified = await _authService.verifyEmail(
-        email: _authService.globalUser!.email,
-        otp: otp,
+      final result = await _authService.changePassword(
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+        confirmPassword: confirmPassword,
       );
 
-      if (emailVerified) {
-        AppDialog.showSuccess("Email Verified Successfully!");
-        Get.toNamed('/home');
+      if (result) {
+        AppDialog.showSuccess("Password Updated Successfully!");
+        // Get.toNamed('/home');
       }
     } catch (e) {
       _handleError(e);

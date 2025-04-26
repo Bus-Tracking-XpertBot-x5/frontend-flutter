@@ -24,7 +24,7 @@ class _MyFloatingActionButtonState extends State<MyFloatingActionButton> {
                   Get.offAllNamed('/busLocations');
                 },
                 tooltip: 'Live Location',
-                backgroundColor: Theme.of(context).secondaryHeaderColor,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
                 foregroundColor: Colors.white,
                 shape: CircleBorder(),
                 child: Icon(Icons.place_rounded, size: 30),

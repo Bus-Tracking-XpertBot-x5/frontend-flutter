@@ -11,11 +11,7 @@ class SplashPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Image.asset(
-          'images/logo.png',
-          fit: BoxFit.contain,
-          height: MediaQuery.of(context).size.height * 0.4,
-        ),
+        child: Image.asset('images/logo.png', fit: BoxFit.contain, height: 96),
       ),
     );
   }

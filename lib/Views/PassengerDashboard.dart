@@ -1,7 +1,7 @@
 import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:buslink_flutter/Widgets/MyBottomNavbar.dart';
-import 'package:buslink_flutter/Widgets/MyFloatingActionButton.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class PassengerDashboardPage extends StatelessWidget {
   const PassengerDashboardPage({super.key});
@@ -12,9 +12,6 @@ class PassengerDashboardPage extends StatelessWidget {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      floatingActionButton: const MyFloatingActionButton(),
-      floatingActionButtonLocation:
-          FloatingActionButtonLocation.miniCenterFloat,
       bottomNavigationBar: const MyBottomNavbar(),
       appBar: MyAppBar(),
       body: Padding(
@@ -31,7 +28,7 @@ class PassengerDashboardPage extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: screenWidth * 0.02),
                 child: Text(
-                  "Journey Overview",
+                  "Passenger Dasbhoard",
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: Colors.grey[800],
@@ -109,12 +106,18 @@ class PassengerDashboardPage extends StatelessWidget {
           icon: Icons.route,
           title: "Plan Route",
           color: Colors.purple[600]!,
+          callback: () {
+            Get.toNamed('busRoutes');
+          },
         ),
         _buildGridItem(
           context,
           icon: Icons.history,
           title: "Trip History",
           color: Colors.teal[600]!,
+          callback: () {
+            Get.toNamed('tripHistory');
+          },
         ),
       ],
     );
@@ -125,13 +128,18 @@ class PassengerDashboardPage extends StatelessWidget {
     required IconData icon,
     required String title,
     required Color color,
+    VoidCallback? callback, // Using VoidCallback for clarity
   }) {
     return Material(
       borderRadius: BorderRadius.circular(16),
       color: color.withOpacity(0.1),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () {},
+        onTap: () {
+          if (callback != null) {
+            callback();
+          }
+        },
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(

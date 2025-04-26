@@ -1,7 +1,9 @@
+import 'package:buslink_flutter/Services/AuthService.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class BottomNavController extends GetxController {
+  final AuthService _authService = Get.find<AuthService>();
   var currentIndex = 0.obs;
 
   final List<String> pages = [
@@ -13,7 +15,19 @@ class BottomNavController extends GetxController {
 
   void updateIndex(int index) {
     currentIndex.value = index;
-    Get.offAndToNamed(pages[index]);
+    print(index);
+    print(_authService.globalUser!.role);
+    if (index == 0 && _authService.globalUser!.role == "driver") {
+      Get.offAllNamed('/driverDashboard');
+    } else if (index == 1 && _authService.globalUser!.role == "driver") {
+      Get.offAllNamed('/driverTrips');
+    } else {
+      Get.offAllNamed(pages[index]);
+    }
+  }
+
+  void resetIndex() {
+    currentIndex.value = 0;
   }
 }
 

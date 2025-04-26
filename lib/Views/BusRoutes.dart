@@ -1,54 +1,12 @@
+import 'package:buslink_flutter/Controllers/BusRoutesController.dart';
+import 'package:buslink_flutter/Services/AuthService.dart';
 import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:buslink_flutter/Widgets/MyBottomNavbar.dart';
-import 'package:buslink_flutter/Widgets/MyFloatingActionButton.dart';
 import 'package:buslink_flutter/Widgets/MyHeader.dart';
+import 'package:buslink_flutter/Widgets/MyTripCard.dart';
 import 'package:flutter/material.dart';
-
-class BusRoute {
-  final String routeNumber;
-  final String startPoint;
-  final String endPoint;
-  final String duration;
-  final String frequency;
-  final bool isExpress;
-
-  BusRoute({
-    required this.routeNumber,
-    required this.startPoint,
-    required this.endPoint,
-    required this.duration,
-    required this.frequency,
-    required this.isExpress,
-  });
-}
-
-final List<BusRoute> routes = [
-  BusRoute(
-    routeNumber: "23",
-    startPoint: "Downtown Terminal",
-    endPoint: "Central ",
-    duration: "45 mins",
-    frequency: "Every 10-15 mins",
-    isExpress: true,
-  ),
-  BusRoute(
-    routeNumber: "18",
-    startPoint: "North Station",
-    endPoint: "Southside Mall",
-    duration: "35 mins",
-    frequency: "Every 20 mins",
-    isExpress: false,
-  ),
-  BusRoute(
-    routeNumber: "45",
-    startPoint: "Eastgate",
-    endPoint: "Westfield Airport",
-    duration: "55 mins",
-    frequency: "Every 30 mins",
-    isExpress: true,
-  ),
-  // Add more routes as needed
-];
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 class BusRoutesPage extends StatefulWidget {
   const BusRoutesPage({super.key});
@@ -57,90 +15,166 @@ class BusRoutesPage extends StatefulWidget {
   State<BusRoutesPage> createState() => _BusRoutesPageState();
 }
 
-class BusRoutesPageState extends StatefulWidget {
-  const BusRoutesPageState({super.key});
+class _BusRoutesPageState extends State<BusRoutesPage> {
+  final BusRoutesController _busRoutesController =
+      Get.find<BusRoutesController>();
+  final TextEditingController _searchController = TextEditingController();
+
+  final AuthService authService = Get.find<AuthService>();
+  final loadingItemIds = <int>{};
 
   @override
-  State<BusRoutesPage> createState() => _BusRoutesPageState();
-}
-
-class _BusRoutesPageState extends State<BusRoutesPage> {
-  final List<String> filters = ['Express', 'Regular', 'Economy'];
-  int selectedFilter = -1;
-  final TextEditingController _searchController = TextEditingController();
+  void initState() {
+    super.initState();
+    final authService = Get.find<AuthService>();
+    if (authService.globalUser?.organization != null) {
+      _busRoutesController.getAllTrips();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
-    final theme = Theme.of(context);
 
     return Scaffold(
-      floatingActionButton: const MyFloatingActionButton(),
-      floatingActionButtonLocation:
-          FloatingActionButtonLocation.miniCenterFloat,
       bottomNavigationBar: const MyBottomNavbar(),
       appBar: MyAppBar(),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: screenHeight * 0.02),
-            const MyHeader(title: 'Search Routes'),
-            SizedBox(height: screenHeight * 0.02),
-            _buildSearchBar(context),
-            SizedBox(height: screenHeight * 0.02),
-            _buildFilterChips(),
-            SizedBox(height: screenHeight * 0.02),
-            Expanded(
-              child: ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                itemCount: routes.length,
-                itemBuilder:
-                    (context, index) => _buildRouteCard(context, routes[index]),
-              ),
-            ),
-          ],
+        child: Obx(
+          () =>
+              authService.globalUser?.organization == null
+                  ? Center(
+                    child: Text(
+                      "Please select an organization to view available routes.",
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                      textAlign: TextAlign.center,
+                    ),
+                  )
+                  : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 20),
+                      const MyHeader(title: 'Search Routes'),
+                      const SizedBox(height: 20),
+                      _buildSearchBar(context),
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child:
+                            _busRoutesController.isLoading.value
+                                ? Center(child: CircularProgressIndicator())
+                                : _busRoutesController.busMovements == null ||
+                                    _busRoutesController.busMovements!.isEmpty
+                                ? Center(child: Text("No Trips found"))
+                                : RefreshIndicator(
+                                  onRefresh: () async {
+                                    await _busRoutesController.getAllTrips();
+                                  },
+                                  child: ListView.builder(
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    itemCount:
+                                        _busRoutesController
+                                            .busMovements!
+                                            .length,
+                                    itemBuilder:
+                                        (context, index) => Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            MyTripCard(
+                                              busMovement:
+                                                  _busRoutesController
+                                                      .busMovements![index],
+                                            ),
+                                            const SizedBox(height: 10),
+
+                                            loadingItemIds.contains(
+                                                  _busRoutesController
+                                                      .busMovements![index]
+                                                      .id,
+                                                )
+                                                ? Center(
+                                                  child: ElevatedButton(
+                                                    onPressed: () {},
+                                                    style: ElevatedButton.styleFrom(
+                                                      fixedSize: Size(
+                                                        60,
+                                                        60,
+                                                      ), // Sets the button's width and height
+                                                      padding:
+                                                          EdgeInsets
+                                                              .zero, // Removes default padding
+                                                    ),
+                                                    child: SizedBox(
+                                                      width: 24,
+                                                      height: 24,
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                            color: Colors.white,
+                                                            strokeWidth: 2.0,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                )
+                                                : Center(
+                                                  child: ElevatedButton.icon(
+                                                    onPressed: () async {
+                                                      final busMovementId =
+                                                          _busRoutesController
+                                                              .busMovements![index]
+                                                              .id;
+                                                      if (!loadingItemIds
+                                                          .contains(
+                                                            busMovementId,
+                                                          )) {
+                                                        loadingItemIds.add(
+                                                          busMovementId,
+                                                        );
+                                                        setState(() {});
+                                                        try {
+                                                          await _busRoutesController
+                                                              .rideTrip(
+                                                                busMovementId:
+                                                                    busMovementId,
+                                                              );
+                                                        } finally {
+                                                          loadingItemIds.remove(
+                                                            busMovementId,
+                                                          );
+                                                          setState(() {});
+                                                        }
+                                                      }
+                                                    },
+                                                    icon: Icon(
+                                                      Icons
+                                                          .confirmation_number_rounded,
+                                                      size: 20,
+                                                    ),
+                                                    label: Text(
+                                                      'Book Now',
+                                                      style: const TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        letterSpacing: 0.5,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                          ],
+                                        ),
+                                  ),
+                                ),
+                      ),
+                      const SizedBox(height: 20),
+                    ],
+                  ),
         ),
       ),
     );
   }
 
-  Widget _buildFilterChips() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Wrap(
-        spacing: 8,
-        children: List.generate(filters.length, (index) {
-          return FilterChip(
-            label: Text(
-              filters[index],
-              style: TextStyle(
-                color:
-                    selectedFilter == index
-                        ? Colors.white
-                        : Theme.of(context).primaryColor,
-              ),
-            ),
-            checkmarkColor: Colors.white,
-            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-            selectedColor: Theme.of(context).primaryColor,
-            selected: selectedFilter == index,
-            onSelected: (bool value) {
-              setState(() {
-                selectedFilter = value ? index : -1;
-              });
-            },
-          );
-        }),
-      ),
-    );
-  }
-
-  // Rest of the methods remain the same as in your original code
-  // (_buildSearchBar, _buildRouteCard, etc.)
   Widget _buildSearchBar(BuildContext context) {
     return Card(
       color: Colors.white,
@@ -151,124 +185,12 @@ class _BusRoutesPageState extends State<BusRoutesPage> {
         side: BorderSide(color: Colors.grey.shade200),
       ),
       child: TextField(
+        controller: _searchController,
         decoration: InputDecoration(
           prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
           hintText: 'Search routes...',
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 16),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRouteCard(BuildContext context, BusRoute route) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          // Handle route card tap if needed
-        },
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(
-            children: [
-              Container(
-                width: 60,
-                height: 60,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  route.routeNumber,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.blue.shade800,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          route.startPoint,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                          ),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 4),
-                          child: Icon(Icons.arrow_right_alt, size: 20),
-                        ),
-                        Text(
-                          route.endPoint,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Icon(Icons.schedule, size: 16, color: Colors.grey[600]),
-                        const SizedBox(width: 4),
-                        Text(
-                          route.duration,
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                        const SizedBox(width: 12),
-                        Icon(Icons.repeat, size: 16, color: Colors.grey[600]),
-                        const SizedBox(width: 4),
-                        Text(
-                          route.frequency,
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                    if (route.isExpress) ...[
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.green.shade50,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          'EXPRESS',
-                          style: TextStyle(
-                            color: Colors.green.shade800,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.favorite_border, color: Colors.grey[400]),
-                onPressed: () {
-                  // Handle favorite button press
-                },
-              ),
-            ],
-          ),
         ),
       ),
     );

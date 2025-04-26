@@ -14,15 +14,11 @@ class ForgetPasswordPage extends StatefulWidget {
 
 class _ForgetPasswordPageState extends State<ForgetPasswordPage>
     with GlobalFunctions {
-  var isLoading = false.obs;
-  final ForgetPasswordController forgetPasswordController =
+  final ForgetPasswordController _forgetPasswordController =
       Get.find<ForgetPasswordController>();
-
   final formKey = GlobalKey<FormState>();
 
   late final TextEditingController emailController = TextEditingController();
-
-  Future<void> _submitForm() async {}
 
   @override
   Widget build(BuildContext context) {
@@ -74,14 +70,16 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage>
                         prefixIcon: const Icon(Icons.email),
                         border: const OutlineInputBorder(),
                         errorText:
-                            forgetPasswordController.fieldErrors['full_name'],
+                            _forgetPasswordController.fieldErrors['email'],
                         // Show full name error
                       ),
-                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value!.isEmpty) {
                           return "Field is required";
+                        }
+                        if (!GetUtils.isEmail(value)) {
+                          return "Field should be email";
                         }
                         return null;
                       },
@@ -90,7 +88,12 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage>
                     // ForgetPasswordPage Button
                     ElevatedButton(
                       onPressed: () {
-                        Get.offAllNamed('enableGpsLocation');
+                        if (!_forgetPasswordController.isLoading.value &&
+                            formKey.currentState!.validate()) {
+                          _forgetPasswordController.forgetPassword(
+                            email: emailController.text.trim(),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(
@@ -99,7 +102,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage>
                         textStyle: TextStyle(fontSize: screenWidth * 0.045),
                       ),
                       child:
-                          isLoading.value
+                          _forgetPasswordController.isLoading.value
                               ? const SizedBox(
                                 width: 20,
                                 height: 20,
@@ -131,7 +134,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage>
                           child: Text(
                             "Resend.",
                             style: TextStyle(
-                              color: Theme.of(context).secondaryHeaderColor,
+                              color: Theme.of(context).colorScheme.secondary,
                               fontWeight: FontWeight.bold,
                               fontSize:
                                   screenWidth * 0.045, // Responsive font size

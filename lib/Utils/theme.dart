@@ -35,7 +35,10 @@ class AppTheme {
       style: OutlinedButton.styleFrom(
         foregroundColor: _primary,
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(width: 2),
+        ),
       ),
     ),
     textTheme: GoogleFonts.poppinsTextTheme().copyWith(

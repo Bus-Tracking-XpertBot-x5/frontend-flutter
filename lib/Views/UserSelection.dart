@@ -1,5 +1,4 @@
 import 'package:buslink_flutter/Widgets/MyAppBar.dart';
-import 'package:buslink_flutter/Widgets/MyLogo.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -47,7 +46,7 @@ class UserSelectionPage extends StatelessWidget {
                 ),
               ),
               Text(
-                "Welcome to buslink_flutter",
+                "Welcome to BusLink",
                 style: TextStyle(
                   fontSize: screenWidth * 0.07,
                   fontWeight: FontWeight.bold,

@@ -7,7 +7,8 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool canPop = Navigator.of(context).canPop();
+    bool canPop =
+        Navigator.of(context).canPop() && !(Get.isDialogOpen ?? false);
     return AppBar(
       leading:
           canPop
@@ -26,7 +27,7 @@ class MyAppBar extends StatelessWidget implements PreferredSizeWidget {
                       Icons.arrow_back,
                       color: Colors.white, // Icon color set to white
                     ),
-                    onPressed: () => Get.back(),
+                    onPressed: () => Get.back(closeOverlays: true),
                   ),
                 ),
               )

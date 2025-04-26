@@ -1,27 +1,23 @@
-import 'package:buslink_flutter/Controllers/VerifySMSController.dart';
+import 'package:buslink_flutter/Controllers/VerifyEmailController.dart';
 import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:buslink_flutter/Utils/GlobalFunctions.dart';
 
-class VerifySMSPage extends StatefulWidget {
-  const VerifySMSPage({super.key});
+class VerifyEmailPage extends StatefulWidget {
+  const VerifyEmailPage({super.key});
 
   @override
-  State<VerifySMSPage> createState() => _VerifySMSPageState();
+  State<VerifyEmailPage> createState() => _VerifyEmailPageState();
 }
 
-class _VerifySMSPageState extends State<VerifySMSPage> with GlobalFunctions {
-  var isLoading = false.obs;
-  final VerifySMSController _verifySMSController =
-      Get.find<VerifySMSController>();
+class _VerifyEmailPageState extends State<VerifyEmailPage>
+    with GlobalFunctions {
   final formKey = GlobalKey<FormState>();
+  final VerifyEmailController _verifyEmailController = VerifyEmailController();
 
-  late final TextEditingController verificationCodeController =
-      TextEditingController();
-
-  Future<void> _submitForm() async {}
+  late final TextEditingController otpController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +57,8 @@ class _VerifySMSPageState extends State<VerifySMSPage> with GlobalFunctions {
                     ),
                     Center(
                       child: CircleAvatar(
-                        backgroundColor: Theme.of(context).secondaryHeaderColor,
+                        backgroundColor:
+                            Theme.of(context).colorScheme.secondary,
                         radius: 60, // Adjust radius as needed
                         child: Padding(
                           padding: EdgeInsets.all(10),
@@ -78,14 +75,12 @@ class _VerifySMSPageState extends State<VerifySMSPage> with GlobalFunctions {
                     ),
                     // Name TextFormField
                     TextFormField(
-                      controller: verificationCodeController,
-
+                      controller: otpController,
                       decoration: InputDecoration(
                         labelText: "Enter Verification Code",
                         prefixIcon: const Icon(Icons.lock),
                         border: const OutlineInputBorder(),
-                        errorText:
-                            _verifySMSController.fieldErrors['full_name'],
+                        errorText: _verifyEmailController.fieldErrors['otp'],
                         // Show full name error
                       ),
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -98,10 +93,15 @@ class _VerifySMSPageState extends State<VerifySMSPage> with GlobalFunctions {
                       },
                     ),
                     SizedBox(height: screenHeight * 0.04),
-                    // VerifySMS Button
+                    // VerifyEmail Button
                     ElevatedButton(
                       onPressed: () {
-                        Get.offAllNamed('userSelection');
+                        if (!_verifyEmailController.isLoading.value &&
+                            formKey.currentState!.validate()) {
+                          _verifyEmailController.veriyfEmailUser(
+                            otpController.text.trim(),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         padding: EdgeInsets.symmetric(
@@ -110,7 +110,7 @@ class _VerifySMSPageState extends State<VerifySMSPage> with GlobalFunctions {
                         textStyle: TextStyle(fontSize: screenWidth * 0.045),
                       ),
                       child:
-                          isLoading.value
+                          _verifyEmailController.isLoading.value
                               ? const SizedBox(
                                 width: 20,
                                 height: 20,
@@ -125,13 +125,7 @@ class _VerifySMSPageState extends State<VerifySMSPage> with GlobalFunctions {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          "Didn't recieve an SMS? ",
-                          style: TextStyle(
-                            fontSize:
-                                screenWidth * 0.04, // Responsive font size
-                          ),
-                        ),
+                        Text("Didn't recieve an SMS? "),
                         TextButton(
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
@@ -142,10 +136,7 @@ class _VerifySMSPageState extends State<VerifySMSPage> with GlobalFunctions {
                           child: Text(
                             "Resend.",
                             style: TextStyle(
-                              color: Theme.of(context).secondaryHeaderColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize:
-                                  screenWidth * 0.045, // Responsive font size
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                           ),
                         ),

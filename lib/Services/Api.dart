@@ -46,9 +46,7 @@ class Api {
           }
           print(error);
 
-          if (error.response!.statusCode != 422) {
-            AppDialog.showError(error.response!.data['message']!);
-          }
+          AppDialog.showError(error.response!.data['message']!);
           return handler.next(error);
         },
       ),

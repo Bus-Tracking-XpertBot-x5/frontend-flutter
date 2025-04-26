@@ -17,6 +17,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ViewSingleTripPage extends StatefulWidget {
   const ViewSingleTripPage({super.key});
@@ -156,7 +157,7 @@ class _ViewSingleTripPageState extends State<ViewSingleTripPage>
           ),
           mode: TravelMode.driving,
         ),
-        googleApiKey: 'YOUR_GOOGLE_API_KEY',
+        googleApiKey: dotenv.env['GOOGLE_MAPS_API_KEY'],
       );
       if (result.status == 'OK') {
         coords.addAll(

@@ -9,6 +9,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:buslink_flutter/Utils/Theme.dart';
 import 'Routes/AppRoutes.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future<Position?> _checkLocationPermissionAndService() async {
   if (!await Geolocator.isLocationServiceEnabled()) {
@@ -28,6 +29,12 @@ Future<Position?> _checkLocationPermissionAndService() async {
 }
 
 void main() async {
+  try {
+    await dotenv.load(fileName: ".env"); // Load environment variables
+  } catch (e) {
+    throw Exception('Error loading .env file: $e'); // Print error if any
+  }
+
   await GetStorage.init();
   await NotificationService.init();
   await Firebase.initializeApp();

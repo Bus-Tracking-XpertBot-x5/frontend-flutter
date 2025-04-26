@@ -6,6 +6,10 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def googleMapApiKey = properties.getProperty('google.map.key')
+
 android {
     namespace = "com.example.buslink_flutter"
     compileSdk = flutter.compileSdkVersion

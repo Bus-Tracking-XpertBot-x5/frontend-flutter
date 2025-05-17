@@ -1,8 +1,7 @@
 import 'package:buslink_flutter/Bindings/GlobalBinding.dart';
 import 'package:buslink_flutter/Services/Api.dart';
-import 'package:buslink_flutter/Views/Notifications.dart';
+import 'package:buslink_flutter/Utils/Notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -29,11 +28,7 @@ Future<Position?> _checkLocationPermissionAndService() async {
 }
 
 void main() async {
-  try {
-    await dotenv.load(fileName: ".env"); // Load environment variables
-  } catch (e) {
-    throw Exception('Error loading .env file: $e'); // Print error if any
-  }
+  await dotenv.load(fileName: ".env");
 
   await GetStorage.init();
   await NotificationService.init();

@@ -1,10 +1,132 @@
+import 'package:buslink_flutter/Services/AuthService.dart';
 import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:buslink_flutter/Widgets/MyBottomNavbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+
+class PassengerDashboardController extends GetxController {
+  final nextTripData = <String, dynamic>{}.obs;
+  final statisticsData = <String, dynamic>{}.obs;
+  final currentTripData = <String, dynamic>{}.obs;
+  final tripHistoryData = <dynamic>[].obs;
+
+  final AuthService authService = Get.find<AuthService>();
+  @override
+  void onInit() {
+    fetchAllData();
+    super.onInit();
+  }
+
+  Future<void> fetchAllData() async {
+    await Future.wait([
+      fetchNextTrip(),
+      fetchStatistics(),
+      fetchCurrentTrip(),
+      fetchTripHistory(),
+    ]);
+  }
+
+  Future<void> fetchNextTrip() async {
+    try {
+      // Replace with actual API call
+      await Future.delayed(const Duration(seconds: 1));
+      nextTripData.value = {
+        "estimated_boarding_time": "2025-04-19 13:52:32",
+        "route_name": "Beirut-Jounieh Coastal",
+        "bus_name": "North Express",
+        "driver_name": "Driver Damous Sajed",
+        "estimated_end": "2025-04-11 06:17:00"
+      };
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to load next trip data');
+    }
+  }
+
+  Future<void> fetchStatistics() async {
+    try {
+      // Replace with actual API call
+      await Future.delayed(const Duration(seconds: 1));
+      statisticsData.value = {
+        "total_trips": 12,
+        "completed": 10,
+        "missed": 1,
+        "scheduled": 1
+      };
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to load statistics');
+    }
+  }
+
+  Future<void> fetchCurrentTrip() async {
+    try {
+      // Replace with actual API call
+      await Future.delayed(const Duration(seconds: 1));
+      currentTripData.value = {
+        "passengers": 24,
+        "remaining_passengers": 8,
+        "route": "Downtown Express",
+        "bus": "City Transporter 12",
+        "driver": "Driver John Doe",
+        "estimated_end": "2024-02-20 09:45:00"
+      };
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to load current trip');
+    }
+  }
+
+  Future<void> fetchTripHistory() async {
+    try {
+      // Replace with actual API call
+      await Future.delayed(const Duration(seconds: 1));
+      tripHistoryData.value = [
+        {
+          "boarding": {
+            "status": "departed",
+            "boarding_time": "2024-02-19 08:30:00",
+          },
+          "trip": {
+            "route_name": "Central Loop",
+            "bus_name": "Metro Bus 45",
+            "driver_name": "Driver Sarah Smith",
+            "start_time": "2024-02-19 08:35:00",
+            "status": "completed"
+          }
+        },
+        {
+          "boarding": {
+            "status": "missed",
+            "boarding_time": "2024-02-18 09:15:00",
+          },
+          "trip": {
+            "route_name": "University Shuttle",
+            "bus_name": "Campus Connect 7",
+            "driver_name": "Driver Mike Johnson",
+            "start_time": "2024-02-18 09:20:00",
+            "status": "completed"
+          }
+        }
+      ];
+    } catch (e) {
+      Get.snackbar('Error', 'Failed to load trip history');
+    }
+  }
+
+  String formatDateTime(String dateString) {
+    final date = DateTime.parse(dateString);
+    return DateFormat('MMM dd, yyyy · hh:mm a').format(date);
+  }
+
+  String formatTime(String dateString) {
+    final date = DateTime.parse(dateString);
+    return DateFormat('hh:mm a').format(date);
+  }
+}
 
 class PassengerDashboardPage extends StatelessWidget {
-  const PassengerDashboardPage({super.key});
+  PassengerDashboardPage({super.key});
+
+  final controller = Get.put(PassengerDashboardController());
 
   @override
   Widget build(BuildContext context) {
@@ -14,53 +136,42 @@ class PassengerDashboardPage extends StatelessWidget {
     return Scaffold(
       bottomNavigationBar: const MyBottomNavbar(),
       appBar: MyAppBar(),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: screenHeight * 0.02),
-              _buildHeader(context),
-              SizedBox(height: screenHeight * 0.02),
-              _buildServiceGrid(context),
-              SizedBox(height: screenHeight * 0.02),
-              Padding(
-                padding: EdgeInsets.only(left: screenWidth * 0.02),
-                child: Text(
-                  "Passenger Dasbhoard",
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[800],
+      body: RefreshIndicator(
+        onRefresh: () => controller.fetchAllData(),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: screenHeight * 0.02),
+                _buildHeader(context),
+                SizedBox(height: screenHeight * 0.02),
+                _buildServiceGrid(context),
+                SizedBox(height: screenHeight * 0.02),
+                Padding(
+                  padding: EdgeInsets.only(left: screenWidth * 0.02),
+                  child: Text(
+                    "Journey Overview",
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey[800],
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(height: screenHeight * 0.02),
-              _buildInfoCard(
-                context,
-                icon: Icons.departure_board,
-                title: "Next Departure",
-                subtitle: "Route 23 to Central Park",
-                meta: "8:15 AM · Stop #12",
-                color: Colors.blue[600]!,
-              ),
-              _buildInfoCard(
-                context,
-                icon: Icons.timelapse,
-                title: "Current Journey",
-                subtitle: "Downtown Station",
-                meta: "On time · 5 mins ETA",
-                color: Colors.green[600]!,
-              ),
-              _buildInfoCard(
-                context,
-                icon: Icons.assignment,
-                title: "Travel Updates",
-                subtitle: "No disruptions reported",
-                meta: "Last updated: 8:00 AM",
-                color: Colors.orange[600]!,
-              ),
-            ],
+                SizedBox(height: screenHeight * 0.02),
+                Obx(() => controller.currentTripData.isNotEmpty
+                    ? _buildCurrentTripCard(context)
+                    : const SizedBox.shrink()),
+                SizedBox(height: screenHeight * 0.02),
+                Obx(() => _buildNextTripCard(context)),
+                SizedBox(height: screenHeight * 0.02),
+                _buildStatisticsGrid(context),
+                SizedBox(height: screenHeight * 0.02),
+                _buildTripHistorySection(context),
+                SizedBox(height: screenHeight * 0.02),
+              ],
+            ),
           ),
         ),
       ),
@@ -74,18 +185,18 @@ class PassengerDashboardPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            "Good Morning, Lisa",
+            "Good Morning, ${controller.authService.globalUser!.name}",
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               fontWeight: FontWeight.w700,
               color: Colors.grey[900],
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
-            "Wednesday, 24 April · 8:10 AM",
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+            DateFormat('EEEE, d MMMM · hh:mm a').format(DateTime.now()),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Colors.grey[600],
+            ),
           ),
         ],
       ),
@@ -106,40 +217,32 @@ class PassengerDashboardPage extends StatelessWidget {
           icon: Icons.route,
           title: "Plan Route",
           color: Colors.purple[600]!,
-          callback: () {
-            Get.toNamed('busRoutes');
-          },
+          callback: () => Get.toNamed('busRoutes'),
         ),
         _buildGridItem(
           context,
           icon: Icons.history,
           title: "Trip History",
           color: Colors.teal[600]!,
-          callback: () {
-            Get.toNamed('tripHistory');
-          },
+          callback: () => Get.toNamed('tripHistory'),
         ),
       ],
     );
   }
 
   Widget _buildGridItem(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required Color color,
-    VoidCallback? callback, // Using VoidCallback for clarity
-  }) {
+      BuildContext context, {
+        required IconData icon,
+        required String title,
+        required Color color,
+        VoidCallback? callback,
+      }) {
     return Material(
       borderRadius: BorderRadius.circular(16),
       color: color.withOpacity(0.1),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
-        onTap: () {
-          if (callback != null) {
-            callback();
-          }
-        },
+        onTap: callback,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -168,14 +271,342 @@ class PassengerDashboardPage extends StatelessWidget {
     );
   }
 
+  Widget _buildCurrentTripCard(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.directions_bus, color: Colors.green[800], size: 28),
+              const SizedBox(width: 12),
+              Text(
+                "Current Journey",
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.green[800],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildTripDetailRow(
+            "Route",
+            controller.currentTripData['route'],
+            Icons.route,
+          ),
+          _buildTripDetailRow(
+            "Bus",
+            controller.currentTripData['bus'],
+            Icons.directions_bus_filled,
+          ),
+          _buildTripDetailRow(
+            "Driver",
+            controller.currentTripData['driver'],
+            Icons.person,
+          ),
+          const Divider(height: 32),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildPassengerStats(
+                "On Board",
+                controller.currentTripData['passengers'].toString(),
+                Colors.blue,
+              ),
+              _buildPassengerStats(
+                "Remaining",
+                controller.currentTripData['remaining_passengers'].toString(),
+                Colors.orange,
+              ),
+              _buildPassengerStats(
+                "ETA",
+                controller.formatTime(controller.currentTripData['estimated_end']),
+                Colors.green,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNextTripCard(BuildContext context) {
+    return controller.nextTripData.isEmpty
+        ? _buildLoadingCard()
+        : _buildInfoCard(
+      context,
+      icon: Icons.departure_board,
+      title: "Next Departure",
+      subtitle: "${controller.nextTripData['route_name']}\n${controller.nextTripData['bus_name']}",
+      meta: controller.formatDateTime(
+          controller.nextTripData['estimated_boarding_time']),
+      color: Colors.blue[600]!,
+    );
+  }
+
+  Widget _buildStatisticsGrid(BuildContext context) {
+    return Obx(() => controller.statisticsData.isEmpty
+        ? _buildLoadingCard()
+        : GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      childAspectRatio: 1.4,
+      mainAxisSpacing: 16,
+      crossAxisSpacing: 16,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      children: [
+        _buildStatCard(
+          context,
+          value: controller.statisticsData['total_trips'].toString(),
+          label: "Total Trips",
+          color: Colors.purple[600]!,
+        ),
+        _buildStatCard(
+          context,
+          value: controller.statisticsData['completed'].toString(),
+          label: "Completed",
+          color: Colors.green[600]!,
+        ),
+        _buildStatCard(
+          context,
+          value: controller.statisticsData['missed'].toString(),
+          label: "Missed",
+          color: Colors.red[600]!,
+        ),
+        _buildStatCard(
+          context,
+          value: controller.statisticsData['scheduled'].toString(),
+          label: "Upcoming",
+          color: Colors.amber[600]!,
+        ),
+      ],
+    ));
+  }
+
+  Widget _buildTripHistorySection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            "Recent Trips",
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[800],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Obx(() => controller.tripHistoryData.isEmpty
+            ? _buildLoadingCard()
+            : SizedBox(
+          height: 160,
+          child: ListView.separated(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            scrollDirection: Axis.horizontal,
+            itemCount: controller.tripHistoryData.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (context, index) {
+              final trip = controller.tripHistoryData[index];
+              return _buildHistoryCard(context, trip);
+            },
+          ),
+        )),
+      ],
+    );
+  }
+
+  Widget _buildHistoryCard(BuildContext context, dynamic trip) {
+    final statusColor = trip['boarding']['status'] == 'departed'
+        ? Colors.green
+        : Colors.red;
+
+    return Container(
+      width: 220,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  trip['boarding']['status'].toString().toUpperCase(),
+                  style: TextStyle(
+                    color: statusColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                controller.formatTime(trip['boarding']['boarding_time']),
+                style: TextStyle(
+                  color: Colors.grey[600],
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            trip['trip']['route_name'],
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            trip['trip']['bus_name'],
+            style: TextStyle(color: Colors.grey[600]),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "Driver: ${trip['trip']['driver_name']}",
+            style: TextStyle(color: Colors.grey[600], fontSize: 12),
+          ),
+          const Spacer(),
+          Text(
+            "Departed at ${controller.formatTime(trip['trip']['start_time'])}",
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 12,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTripDetailRow(String label, String value, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: Colors.grey[600]),
+          const SizedBox(width: 12),
+          Text(
+            "$label: ",
+            style: const TextStyle(fontWeight: FontWeight.w500),
+          ),
+          Text(value),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPassengerStats(String label, String value, Color color) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard(
+      BuildContext context, {
+        required String value,
+        required String label,
+        required Color color,
+      }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              value,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w800,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildInfoCard(
-    BuildContext context, {
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String meta,
-    required Color color,
-  }) {
+      BuildContext context, {
+        required IconData icon,
+        required String title,
+        required String subtitle,
+        required String meta,
+        required Color color,
+      }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       decoration: BoxDecoration(
@@ -212,9 +643,9 @@ class PassengerDashboardPage extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               subtitle,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: Colors.grey[600],
+              ),
             ),
           ],
         ),
@@ -227,6 +658,18 @@ class PassengerDashboardPage extends StatelessWidget {
           textAlign: TextAlign.end,
         ),
       ),
+    );
+  }
+
+  Widget _buildLoadingCard() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Center(child: CircularProgressIndicator()),
     );
   }
 }

@@ -9,7 +9,7 @@ class BottomNavController extends GetxController {
   final List<String> pages = [
     '/passengerDashboard',
     '/busRoutes',
-    '/notifications',
+    '/updateProfile',
     '/settings',
   ];
 
@@ -74,10 +74,7 @@ class MyBottomNavbar extends StatelessWidget {
               icon: Icon(Icons.directions_bus),
               label: 'Bus Stops',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.notifications_none_rounded),
-              label: 'Notifications',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
               label: 'Settings',

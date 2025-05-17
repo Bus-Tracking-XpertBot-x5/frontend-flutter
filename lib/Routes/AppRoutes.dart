@@ -27,7 +27,6 @@ import 'package:buslink_flutter/Views/DriverTrips.dart';
 import 'package:buslink_flutter/Views/EnableGPS.dart';
 import 'package:buslink_flutter/Views/ForgetPassword.dart';
 import 'package:buslink_flutter/Views/Landing.dart';
-import 'package:buslink_flutter/Views/Notifications.dart';
 import 'package:buslink_flutter/Views/PassengerDashboard.dart';
 import 'package:buslink_flutter/Views/PickOrganization.dart';
 import 'package:buslink_flutter/Views/Settings.dart';
@@ -95,7 +94,6 @@ class AppRoutes {
       page: () => BusRoutesPage(),
       binding: BusRoutesBinding(),
     ),
-    GetPage(name: notifications, page: () => NotificationsPage()),
     GetPage(
       name: settings,
       page: () => SettingsPage(),

@@ -22,8 +22,8 @@ class NotificationService {
   static Future<void> showMockNotification(String title, String body) async {
     const AndroidNotificationDetails androidDetails =
         AndroidNotificationDetails(
-          'mock_channel',
-          'Mock Notifications',
+          'buslink_channel',
+          'BusLink Notifications',
           channelDescription: 'For testing local notifications',
           importance: Importance.max,
           priority: Priority.high,
@@ -75,6 +75,7 @@ class NotificationService {
   }
 
   static void storeDeviceToken() async {
+    print('FCM TOKEN: ${token}');
     final response = await Api.dio.post(
       '/user/store-device-token',
       data: {"device_token": token},

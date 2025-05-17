@@ -41,26 +41,26 @@ class _BusRoutesPageState extends State<BusRoutesPage> {
       appBar: MyAppBar(),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-        child: Obx(
-          () =>
-              authService.globalUser?.organization == null
-                  ? Center(
-                    child: Text(
-                      "Please select an organization to view available routes.",
-                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                      textAlign: TextAlign.center,
-                    ),
-                  )
-                  : Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 20),
-                      const MyHeader(title: 'Search Routes'),
-                      const SizedBox(height: 20),
-                      _buildSearchBar(context),
-                      const SizedBox(height: 20),
-                      Expanded(
-                        child:
+        child:
+            authService.globalUser?.organization == null
+                ? Center(
+                  child: Text(
+                    "Please select an organization to view available routes.",
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                    textAlign: TextAlign.center,
+                  ),
+                )
+                : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+                    const MyHeader(title: 'Search Routes'),
+                    const SizedBox(height: 20),
+                    _buildSearchBar(context),
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: Obx(
+                        () =>
                             _busRoutesController.isLoading.value
                                 ? Center(child: CircularProgressIndicator())
                                 : _busRoutesController.busMovements == null ||
@@ -167,10 +167,10 @@ class _BusRoutesPageState extends State<BusRoutesPage> {
                                   ),
                                 ),
                       ),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-        ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
       ),
     );
   }

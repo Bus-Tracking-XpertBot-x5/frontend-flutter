@@ -6,10 +6,6 @@ plugins {
     id("com.google.gms.google-services")
 }
 
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-def googleMapApiKey = properties.getProperty('google.map.key')
-
 android {
     namespace = "com.example.buslink_flutter"
     compileSdk = flutter.compileSdkVersion
@@ -46,8 +42,8 @@ android {
 
     dependencies {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-        implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+        coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+        implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
         implementation("com.google.firebase:firebase-analytics")
     }
 }

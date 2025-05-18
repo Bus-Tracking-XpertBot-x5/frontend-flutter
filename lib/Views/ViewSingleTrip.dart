@@ -528,23 +528,23 @@ class _ViewSingleTripPageState extends State<ViewSingleTripPage>
                                             ),
 
                                             // Notify Action
-                                            SlidableAction(
-                                              padding: EdgeInsets.only(
-                                                bottom: 0,
-                                              ),
-                                              flex: 1,
-                                              onPressed:
-                                                  (_) =>
-                                                      _sendProximityNotification(
-                                                        boarding,
-                                                      ),
-                                              backgroundColor: const Color(
-                                                0xFFF59E0B,
-                                              ),
-                                              foregroundColor: Colors.white,
-                                              icon: Icons.notifications,
-                                              label: 'Notify',
-                                            ),
+                                            // SlidableAction(
+                                            //   padding: EdgeInsets.only(
+                                            //     bottom: 0,
+                                            //   ),
+                                            //   flex: 1,
+                                            //   onPressed:
+                                            //       (_) =>
+                                            //           _sendProximityNotification(
+                                            //             boarding,
+                                            //           ),
+                                            //   backgroundColor: const Color(
+                                            //     0xFFF59E0B,
+                                            //   ),
+                                            //   foregroundColor: Colors.white,
+                                            //   icon: Icons.notifications,
+                                            //   label: 'Notify',
+                                            // ),
                                           ],
                                         ),
                                         child: Container(

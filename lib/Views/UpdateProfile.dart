@@ -33,7 +33,8 @@ class _UpdateProfilePageState extends State<UpdateProfilePage>
     nameController = TextEditingController(text: user.name);
     emailController = TextEditingController(text: user.email);
     number = PhoneNumber.fromCompleteNumber(completeNumber: user.phoneNumber);
-    phoneNumberController = TextEditingController(text: number!.number);
+    phoneNumberController = TextEditingController(text: user.phoneNumber);
+    print(phoneNumberController.text);
   }
 
   @override
@@ -112,7 +113,6 @@ class _UpdateProfilePageState extends State<UpdateProfilePage>
                       inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                       onChanged: (phone) {
                         phoneNumberController.text = phone.completeNumber;
-                        print(phoneNumberController.text);
                       },
                     ),
                     const SizedBox(height: 30),

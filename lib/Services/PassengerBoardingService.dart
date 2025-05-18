@@ -43,4 +43,39 @@ class PassengerBoardingService extends GetxService {
 
     return response.statusCode == 200;
   }
+
+  Future<dynamic> getNextTrip() async {
+    final response = await Api.dio.get(
+      '/bus-movements/next-trip',
+    );
+
+    return response.data['data'];
+  }
+
+
+  Future<dynamic> getHistory() async {
+    final response = await Api.dio.get(
+      '/bus-movements/history',
+    );
+
+    return response.data['data'];
+  }
+
+
+  Future<dynamic> getStatistics() async {
+    final response = await Api.dio.get(
+      '/bus-movements/statistics',
+    );
+
+    return response.data['data'];
+  }
+
+
+  Future<dynamic> getCurrentTrip() async {
+    final response = await Api.dio.get(
+      '/bus-movements/current-trip',
+    );
+
+    return response.data['data'];
+  }
 }

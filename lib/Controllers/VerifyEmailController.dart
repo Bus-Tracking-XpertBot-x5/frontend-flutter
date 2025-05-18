@@ -1,4 +1,3 @@
-import 'package:buslink_flutter/Utils/Notifications.dart';
 import 'package:get/get.dart';
 import 'package:buslink_flutter/Services/AuthService.dart';
 import 'package:buslink_flutter/Utils/Dialog.dart';
@@ -20,7 +19,6 @@ class VerifyEmailController extends GetxController {
       );
 
       if (emailVerified) {
-        NotificationService.storeDeviceToken();
         AppDialog.showSuccess("Email Verified Successfully!");
         await Future.delayed(Duration(seconds: 3), () async {
           Get.offAllNamed('/userSelection');

@@ -1,4 +1,5 @@
 import 'package:buslink_flutter/Services/AuthService.dart';
+import 'package:buslink_flutter/Services/PassengerBoardingService.dart';
 import 'package:buslink_flutter/Widgets/MyAppBar.dart';
 import 'package:buslink_flutter/Widgets/MyBottomNavbar.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,7 @@ class PassengerDashboardController extends GetxController {
   final tripHistoryData = <dynamic>[].obs;
 
   final AuthService authService = Get.find<AuthService>();
+  final PassengerBoardingService passengerBoardingService = Get.find<PassengerBoardingService>();
   @override
   void onInit() {
     fetchAllData();
@@ -23,21 +25,12 @@ class PassengerDashboardController extends GetxController {
       fetchNextTrip(),
       fetchStatistics(),
       fetchCurrentTrip(),
-      fetchTripHistory(),
     ]);
   }
 
   Future<void> fetchNextTrip() async {
     try {
-      // Replace with actual API call
-      await Future.delayed(const Duration(seconds: 1));
-      nextTripData.value = {
-        "estimated_boarding_time": "2025-04-19 13:52:32",
-        "route_name": "Beirut-Jounieh Coastal",
-        "bus_name": "North Express",
-        "driver_name": "Driver Damous Sajed",
-        "estimated_end": "2025-04-11 06:17:00"
-      };
+      nextTripData.value = await passengerBoardingService.getNextTrip();
     } catch (e) {
       Get.snackbar('Error', 'Failed to load next trip data');
     }
@@ -45,14 +38,14 @@ class PassengerDashboardController extends GetxController {
 
   Future<void> fetchStatistics() async {
     try {
-      // Replace with actual API call
-      await Future.delayed(const Duration(seconds: 1));
-      statisticsData.value = {
-        "total_trips": 12,
-        "completed": 10,
-        "missed": 1,
-        "scheduled": 1
-      };
+
+  //     {
+  //     "total_trips": 12,
+  //   "completed": 10,
+  //   "missed": 1,
+  //   "scheduled": 1
+  // }
+      statisticsData.value = await passengerBoardingService.getStatistics();
     } catch (e) {
       Get.snackbar('Error', 'Failed to load statistics');
     }
@@ -60,58 +53,19 @@ class PassengerDashboardController extends GetxController {
 
   Future<void> fetchCurrentTrip() async {
     try {
-      // Replace with actual API call
-      await Future.delayed(const Duration(seconds: 1));
-      currentTripData.value = {
-        "passengers": 24,
-        "remaining_passengers": 8,
-        "route": "Downtown Express",
-        "bus": "City Transporter 12",
-        "driver": "Driver John Doe",
-        "estimated_end": "2024-02-20 09:45:00"
-      };
+  //     {
+  //       "passengers": 24,
+  //   "remaining_passengers": 8,
+  //   "route": "Downtown Express",
+  //   "bus": "City Transporter 12",
+  //   "driver": "Driver John Doe",
+  //   "estimated_end": "2024-02-20 09:45:00"
+  // }
+      currentTripData.value = await passengerBoardingService.getCurrentTrip();
     } catch (e) {
       Get.snackbar('Error', 'Failed to load current trip');
     }
   }
-
-  Future<void> fetchTripHistory() async {
-    try {
-      // Replace with actual API call
-      await Future.delayed(const Duration(seconds: 1));
-      tripHistoryData.value = [
-        {
-          "boarding": {
-            "status": "departed",
-            "boarding_time": "2024-02-19 08:30:00",
-          },
-          "trip": {
-            "route_name": "Central Loop",
-            "bus_name": "Metro Bus 45",
-            "driver_name": "Driver Sarah Smith",
-            "start_time": "2024-02-19 08:35:00",
-            "status": "completed"
-          }
-        },
-        {
-          "boarding": {
-            "status": "missed",
-            "boarding_time": "2024-02-18 09:15:00",
-          },
-          "trip": {
-            "route_name": "University Shuttle",
-            "bus_name": "Campus Connect 7",
-            "driver_name": "Driver Mike Johnson",
-            "start_time": "2024-02-18 09:20:00",
-            "status": "completed"
-          }
-        }
-      ];
-    } catch (e) {
-      Get.snackbar('Error', 'Failed to load trip history');
-    }
-  }
-
   String formatDateTime(String dateString) {
     final date = DateTime.parse(dateString);
     return DateFormat('MMM dd, yyyy · hh:mm a').format(date);
@@ -167,8 +121,6 @@ class PassengerDashboardPage extends StatelessWidget {
                 Obx(() => _buildNextTripCard(context)),
                 SizedBox(height: screenHeight * 0.02),
                 _buildStatisticsGrid(context),
-                SizedBox(height: screenHeight * 0.02),
-                _buildTripHistorySection(context),
                 SizedBox(height: screenHeight * 0.02),
               ],
             ),
@@ -398,40 +350,6 @@ class PassengerDashboardPage extends StatelessWidget {
         ),
       ],
     ));
-  }
-
-  Widget _buildTripHistorySection(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Text(
-            "Recent Trips",
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: Colors.grey[800],
-            ),
-          ),
-        ),
-        const SizedBox(height: 12),
-        Obx(() => controller.tripHistoryData.isEmpty
-            ? _buildLoadingCard()
-            : SizedBox(
-          height: 160,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            scrollDirection: Axis.horizontal,
-            itemCount: controller.tripHistoryData.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (context, index) {
-              final trip = controller.tripHistoryData[index];
-              return _buildHistoryCard(context, trip);
-            },
-          ),
-        )),
-      ],
-    );
   }
 
   Widget _buildHistoryCard(BuildContext context, dynamic trip) {

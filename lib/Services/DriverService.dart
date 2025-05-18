@@ -54,4 +54,50 @@ class DriverService extends GetxService {
 
     return response.statusCode == 200;
   }
+
+  Future<dynamic> getScheduledPassengers() async {
+    final response = await Api.dio.get(
+      '/driver/scheduled-passengers',
+    );
+  //   {
+  //     "count": 0,
+  //   "passengers": 0
+  // }
+    return response.data;
+  }
+
+
+  Future<dynamic> getBoardedPassengers() async {
+    final response = await Api.dio.get(
+      '/driver/boarded-passengers',
+    );
+  //   {
+  //     "count": 0,
+  //   "passengers": 0
+  // }
+    return response.data;
+  }
+
+
+  Future<dynamic> getMonthlyMoney() async {
+    final response = await Api.dio.get(
+      '/driver/monthly-money',
+    );
+  //   {
+  //     "totalMoney": 6
+  // }
+    return response.data;
+  }
+
+
+  Future<dynamic> getMonthlyTime() async {
+    final response = await Api.dio.get(
+      '/driver/monthly-time',
+    );
+  //   {
+  //     "hours": 23,
+  //   "minutes": 50
+  // }
+    return response.data;
+  }
 }

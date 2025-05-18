@@ -1,5 +1,4 @@
 import 'package:buslink_flutter/Services/DriverService.dart';
-import 'package:buslink_flutter/Utils/Notifications.dart';
 import 'package:buslink_flutter/Widgets/MyBottomNavbar.dart';
 import 'package:get/get.dart';
 import 'package:buslink_flutter/Models/UserModel.dart';
@@ -25,7 +24,6 @@ class SignInController extends GetxController {
       _authService.globalUser = user;
       print(_authService.globalUser);
       Get.find<BottomNavController>().resetIndex();
-      NotificationService.storeDeviceToken();
       if (_authService.globalUser!.role == "driver") {
         _driverService.globalDriver = await _driverService.getDriverByUserId(
           id: user.id,

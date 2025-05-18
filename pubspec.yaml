@@ -48,9 +48,6 @@ dependencies:
   flutter_vector_icons: ^2.0.0
   google_maps_flutter: ^2.12.1
   flutter_polyline_points: ^2.1.0
-  flutter_local_notifications: ^19.0.0
-  firebase_core: any
-  firebase_messaging: any
   flutter_slidable: any
   flutter_dotenv: ^5.1.0
 

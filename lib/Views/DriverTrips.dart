@@ -36,8 +36,7 @@ class _DriverTripsPageState extends State<DriverTripsPage> {
       appBar: MyAppBar(),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-        child: Obx(
-          () => Column(
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
@@ -56,35 +55,36 @@ class _DriverTripsPageState extends State<DriverTripsPage> {
               const SizedBox(height: 24),
               Expanded(
                 child:
-                    _driverTripsController.isLoading.value
-                        ? Center(child: CircularProgressIndicator())
-                        : _driverTripsController.busMovements == null ||
-                            _driverTripsController.busMovements!.isEmpty
-                        ? Center(child: Text("No Trips Found"))
-                        : RefreshIndicator(
-                          onRefresh: () async {
-                            await _driverTripsController.getAllTrips(
-                              search: _searchController.text.trim(),
-                              statusFilter: _getStatusFilterValue(),
-                            );
-                          },
-                          child: ListView.separated(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            itemCount:
-                                _driverTripsController.busMovements!.length,
-                            separatorBuilder:
-                                (context, index) => const SizedBox(height: 12),
-                            itemBuilder:
-                                (context, index) => MyTripCard(
-                                  busMovement:
-                                      _driverTripsController
-                                          .busMovements![index],
-                                ),
+                    Obx(
+                        () => _driverTripsController.isLoading.value
+                          ? Center(child: CircularProgressIndicator())
+                          : _driverTripsController.busMovements == null ||
+                              _driverTripsController.busMovements!.isEmpty
+                          ? Center(child: Text("No Trips Found"))
+                          : RefreshIndicator(
+                            onRefresh: () async {
+                              await _driverTripsController.getAllTrips(
+                                search: _searchController.text.trim(),
+                                statusFilter: _getStatusFilterValue(),
+                              );
+                            },
+                            child: ListView.separated(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              itemCount:
+                                  _driverTripsController.busMovements!.length,
+                              separatorBuilder:
+                                  (context, index) => const SizedBox(height: 12),
+                              itemBuilder:
+                                  (context, index) => MyTripCard(
+                                    busMovement:
+                                        _driverTripsController
+                                            .busMovements![index],
+                                  ),
+                            ),
                           ),
-                        ),
+                    ),
               ),
             ],
-          ),
         ),
       ),
     );

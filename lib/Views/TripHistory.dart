@@ -36,8 +36,7 @@ class _TripHistoryPageState extends State<TripHistoryPage> {
       appBar: MyAppBar(),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-        child: Obx(
-          () => Column(
+        child:  Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
@@ -47,26 +46,27 @@ class _TripHistoryPageState extends State<TripHistoryPage> {
               const SizedBox(height: 20),
               Expanded(
                 child:
-                    _tripHistoryController.isLoading.value
-                        ? Center(child: CircularProgressIndicator())
-                        : _tripHistoryController.passengerBoardings == null ||
-                            _tripHistoryController.passengerBoardings!.isEmpty
-                        ? Center(child: Text("No Trips Found."))
-                        : ListView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          itemCount:
-                              _tripHistoryController.passengerBoardings!.length,
-                          itemBuilder:
-                              (context, index) => _buildTripCard(
-                                _tripHistoryController
-                                    .passengerBoardings![index],
-                              ),
-                        ),
+                    Obx(
+                        () => _tripHistoryController.isLoading.value
+                          ? Center(child: CircularProgressIndicator())
+                          : _tripHistoryController.passengerBoardings == null ||
+                              _tripHistoryController.passengerBoardings!.isEmpty
+                          ? Center(child: Text("No Trips Found."))
+                          : ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            itemCount:
+                                _tripHistoryController.passengerBoardings!.length,
+                            itemBuilder:
+                                (context, index) => _buildTripCard(
+                                  _tripHistoryController
+                                      .passengerBoardings![index],
+                                ),
+                          ),
+                    ),
               ),
             ],
           ),
-        ),
-      ),
+        )
     );
   }
 

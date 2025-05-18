@@ -1,6 +1,5 @@
 import 'package:buslink_flutter/Models/OrganizationModel.dart';
 import 'package:buslink_flutter/Services/DriverService.dart';
-import 'package:buslink_flutter/Utils/Notifications.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:buslink_flutter/Models/UserModel.dart';
@@ -28,7 +27,6 @@ class AuthService extends GetxService {
           // GetStorage().remove('login_token');
           globalUser = await getLoggedInUser();
           isLoggedIn.value = true;
-          NotificationService.storeDeviceToken();
           if (globalUser!.role == "driver") {
             final DriverService _driverService = Get.find<DriverService>();
             _driverService.globalDriver = await _driverService

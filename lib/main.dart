@@ -1,7 +1,5 @@
 import 'package:buslink_flutter/Bindings/GlobalBinding.dart';
 import 'package:buslink_flutter/Services/Api.dart';
-import 'package:buslink_flutter/Utils/Notifications.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -28,12 +26,11 @@ Future<Position?> _checkLocationPermissionAndService() async {
 }
 
 void main() async {
-  await dotenv.load(fileName: ".env");
+  await dotenv.load();
+
+  print("📍 Google Maps API Key: ${dotenv.env['GOOGLE_MAPS_API_KEY']}");
 
   await GetStorage.init();
-  await NotificationService.init();
-  await Firebase.initializeApp();
-  NotificationService.initFCM();
   _checkLocationPermissionAndService();
   Api.initializeInterceptors();
   runApp(MyApp());
